@@ -1,7 +1,7 @@
 """Executive summary and report generation."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict
 
 from .analyzer import AnalysisResult, VulnerabilityMatch
 

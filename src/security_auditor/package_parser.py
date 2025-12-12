@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Dict
 
 from pydantic import BaseModel, Field
 
@@ -59,15 +59,15 @@ class PackageManifest(BaseModel):
 
     name: Optional[str] = None
     version: Optional[str] = None
-    dependencies: list[PackageDependency] = Field(default_factory=list)
+    dependencies: List[PackageDependency] = Field(default_factory=list)
 
     @property
-    def all_dependencies(self) -> list[PackageDependency]:
+    def all_dependencies(self) -> List[PackageDependency]:
         """Get all dependencies."""
         return self.dependencies
 
     @property
-    def runtime_dependencies(self) -> list[PackageDependency]:
+    def runtime_dependencies(self) -> List[PackageDependency]:
         """Get only runtime dependencies."""
         return [dep for dep in self.dependencies if dep.type == "runtime"]
 

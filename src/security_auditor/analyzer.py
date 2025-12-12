@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List, Dict
 
 from pydantic import BaseModel, Field
 
@@ -42,41 +42,41 @@ class AnalysisResult(BaseModel):
     """Result of vulnerability analysis."""
 
     manifest: PackageManifest
-    vulnerabilities: list[VulnerabilityMatch] = Field(default_factory=list)
+    vulnerabilities: List[VulnerabilityMatch] = Field(default_factory=list)
     severity_stats: SeverityStats = Field(default_factory=SeverityStats)
     analysis_date: datetime = Field(default_factory=datetime.now)
     packages_analyzed: int = 0
     packages_with_vulnerabilities: int = 0
 
-    def get_critical_vulnerabilities(self) -> list[VulnerabilityMatch]:
+    def get_critical_vulnerabilities(self) -> List[VulnerabilityMatch]:
         """Get all CRITICAL severity vulnerabilities."""
         return [
             v for v in self.vulnerabilities
             if v.cve.severity == "CRITICAL"
         ]
 
-    def get_high_vulnerabilities(self) -> list[VulnerabilityMatch]:
+    def get_high_vulnerabilities(self) -> List[VulnerabilityMatch]:
         """Get all HIGH severity vulnerabilities."""
         return [
             v for v in self.vulnerabilities
             if v.cve.severity == "HIGH"
         ]
 
-    def get_actionable_vulnerabilities(self) -> list[VulnerabilityMatch]:
+    def get_actionable_vulnerabilities(self) -> List[VulnerabilityMatch]:
         """Get CRITICAL and HIGH severity vulnerabilities."""
         return [
             v for v in self.vulnerabilities
             if v.cve.severity in ["CRITICAL", "HIGH"]
         ]
 
-    def get_vulnerabilities_by_package(self) -> dict[str, list[VulnerabilityMatch]]:
+    def get_vulnerabilities_by_package(self) -> Dict[str, List[VulnerabilityMatch]]:
         """Group vulnerabilities by package name."""
-        grouped: dict[str, list[VulnerabilityMatch]] = defaultdict(list)
+        grouped: Dict[str, List[VulnerabilityMatch]] = defaultdict(list)
         for vuln in self.vulnerabilities:
             grouped[vuln.dependency.name].append(vuln)
         return dict(grouped)
 
-    def get_recent_vulnerabilities(self, days: int = 30) -> list[VulnerabilityMatch]:
+    def get_recent_vulnerabilities(self, days: int = 30) -> List[VulnerabilityMatch]:
         """Get vulnerabilities published in the last N days."""
         cutoff = datetime.now() - timedelta(days=days)
         return [
@@ -91,7 +91,7 @@ class VulnerabilityAnalyzer:
     def __init__(
         self,
         nvd_client: NVDClient,
-        severity_filter: Optional[list[str]] = None,
+        severity_filter: Optional[List[str]] = None,
         include_dev_dependencies: bool = False
     ):
         """
@@ -181,7 +181,7 @@ class VulnerabilityAnalyzer:
         self,
         dependency: PackageDependency,
         days_back: Optional[int] = None
-    ) -> list[CVEData]:
+    ) -> List[CVEData]:
         """
         Check a single dependency for vulnerabilities.
 
@@ -232,7 +232,7 @@ class VulnerabilityAnalyzer:
 
     async def analyze_dependency_list(
         self,
-        dependencies: list[PackageDependency],
+        dependencies: List[PackageDependency],
         days_back: Optional[int] = None
     ) -> AnalysisResult:
         """

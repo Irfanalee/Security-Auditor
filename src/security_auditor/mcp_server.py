@@ -3,7 +3,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, List, Dict
 
 from dotenv import load_dotenv
 from mcp.server import Server
@@ -34,7 +34,7 @@ class SecurityAuditorMCP:
         """Register MCP protocol handlers."""
 
         @self.server.list_tools()
-        async def list_tools() -> list[Tool]:
+        async def list_tools() -> List[Tool]:
             """List available tools."""
             return [
                 Tool(
@@ -133,7 +133,7 @@ class SecurityAuditorMCP:
             ]
 
         @self.server.call_tool()
-        async def call_tool(name: str, arguments: Any) -> list[TextContent]:
+        async def call_tool(name: str, arguments: Any) -> List[TextContent]:
             """Handle tool calls."""
             try:
                 if name == "audit_package_file":
@@ -166,7 +166,7 @@ class SecurityAuditorMCP:
 
         return self.nvd_client
 
-    async def _audit_package_file(self, arguments: dict) -> list[TextContent]:
+    async def _audit_package_file(self, arguments: dict) -> List[TextContent]:
         """Audit a package file for vulnerabilities."""
         file_path = arguments["file_path"]
         severity_filter = arguments.get("severity_filter", ["CRITICAL", "HIGH"])
@@ -210,7 +210,7 @@ class SecurityAuditorMCP:
 
         return [TextContent(type="text", text=text)]
 
-    async def _search_cve(self, arguments: dict) -> list[TextContent]:
+    async def _search_cve(self, arguments: dict) -> List[TextContent]:
         """Search for CVE information."""
         cve_id = arguments.get("cve_id")
         keyword = arguments.get("keyword")
@@ -256,7 +256,7 @@ class SecurityAuditorMCP:
 
         return [TextContent(type="text", text="\n".join(lines))]
 
-    async def _get_vulnerability_stats(self, arguments: dict) -> list[TextContent]:
+    async def _get_vulnerability_stats(self, arguments: dict) -> List[TextContent]:
         """Get vulnerability statistics for a package file."""
         file_path = arguments["file_path"]
 

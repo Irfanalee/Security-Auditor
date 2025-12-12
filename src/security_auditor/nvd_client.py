@@ -2,7 +2,7 @@
 
 import asyncio
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any, List, Optional
 from urllib.parse import urlencode
 
 import httpx
@@ -28,8 +28,8 @@ class CVEData(BaseModel):
     last_modified_date: datetime
     cvss_v3: Optional[CVSSMetrics] = None
     cvss_v2: Optional[CVSSMetrics] = None
-    references: list[str] = Field(default_factory=list)
-    cpe_matches: list[str] = Field(default_factory=list)
+    references: List[str] = Field(default_factory=list)
+    cpe_matches: List[str] = Field(default_factory=list)
 
     @property
     def severity(self) -> str:
@@ -188,7 +188,7 @@ class NVDClient:
         cvss_v3_severity: Optional[str] = None,
         results_per_page: int = 2000,
         start_index: int = 0
-    ) -> list[CVEData]:
+    ) -> List[CVEData]:
         """
         Search for CVEs using various filters.
 
@@ -257,8 +257,8 @@ class NVDClient:
         vendor: str,
         product: str,
         version: Optional[str] = None,
-        severity_filter: Optional[list[str]] = None
-    ) -> list[CVEData]:
+        severity_filter: Optional[List[str]] = None
+    ) -> List[CVEData]:
         """
         Search for CVEs affecting a specific product.
 
